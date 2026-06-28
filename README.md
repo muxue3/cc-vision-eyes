@@ -85,7 +85,7 @@ Claude Code → cc-vision-eyes（描述图片）→ 翻译器（如 a2o，Anthro
 需要 Node.js ≥ 18（用到原生 fetch / Web Streams），无第三方依赖。
 
 ```bash
-git clone https://github.com/<your-name>/cc-vision-eyes.git
+git clone https://github.com/muxue3/cc-vision-eyes.git
 cd cc-vision-eyes
 cp config.example.json config.json   # Windows: copy config.example.json config.json
 # 编辑 config.json 填入端点和 key
