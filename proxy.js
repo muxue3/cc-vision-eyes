@@ -75,15 +75,15 @@ if (!CFG.brainBaseUrl || !CFG.brainApiKey) {
   process.exit(1);
 }
 
-// 把一张 base64 图片丢给眼睛模型，拿回文字描述
-async function describeImage(mediaType, b64) {
+// 把一张图片（base64 data URL 或 http(s) URL）丢给眼睛模型，拿回文字描述
+async function describeImageByUrl(imageUrl) {
   const body = {
     model: CFG.eyesModel,
     messages: [
       {
         role: "user",
         content: [
-          { type: "image_url", image_url: { url: `data:${mediaType};base64,${b64}` } },
+          { type: "image_url", image_url: { url: imageUrl } },
           { type: "text", text: CFG.visionPrompt },
         ],
       },
@@ -108,13 +108,19 @@ async function replaceImagesInContentArray(arr) {
   for (let i = 0; i < arr.length; i++) {
     const item = arr[i];
     if (!item || typeof item !== "object") continue;
-    // 直接的图片块
-    if (item.type === "image" && item.source?.type === "base64") {
-      const desc = await describeImage(item.source.media_type, item.source.data).catch(
-        (e) => `(识图失败：${e.message})`
-      );
-      arr[i] = { type: "text", text: `[图片识别结果，由眼睛模型描述]：\n${desc}` };
-      count++;
+    // 直接的图片块（支持 base64 和 url 两种来源）
+    if (item.type === "image" && item.source) {
+      let imageUrl = null;
+      if (item.source.type === "base64" && item.source.data) {
+        imageUrl = `data:${item.source.media_type || "image/png"};base64,${item.source.data}`;
+      } else if (item.source.type === "url" && item.source.url) {
+        imageUrl = item.source.url;
+      }
+      if (imageUrl) {
+        const desc = await describeImageByUrl(imageUrl).catch((e) => `(识图失败：${e.message})`);
+        arr[i] = { type: "text", text: `[图片识别结果，由眼睛模型描述]：\n${desc}` };
+        count++;
+      }
     }
     // tool_result 里嵌套的图片（Claude Code 的 Read 工具读图会走这条）
     else if (item.type === "tool_result" && Array.isArray(item.content)) {
@@ -140,6 +146,12 @@ const server = http.createServer((req, res) => {
   const chunks = [];
   req.on("data", (c) => chunks.push(c));
   req.on("end", async () => {
+    // 健康探活：GET / 或 /health 本地直接回 200，不打扰上游
+    if (req.method === "GET" && (req.url === "/" || req.url === "/health")) {
+      res.writeHead(200, { "content-type": "application/json" });
+      res.end(JSON.stringify({ status: "ok", service: "cc-vision-eyes" }));
+      return;
+    }
     const raw = Buffer.concat(chunks);
     const targetUrl = CFG.brainBaseUrl + req.url; // /v1/messages → <brainBaseUrl>/v1/messages
 
