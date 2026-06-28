@@ -1,0 +1,26 @@
+{
+  "name": "cc-vision-eyes",
+  "version": "0.1.0",
+  "description": "Transparent proxy that gives a non-multimodal primary model (the brain) image understanding via a separate vision model (the eyes) — the eyes only describe, the brain does all reasoning. Supports OpenAI-format vision endpoints like Aliyun DashScope qwen-vl-max.",
+  "bin": {
+    "cc-vision-eyes": "proxy.js"
+  },
+  "main": "proxy.js",
+  "scripts": {
+    "start": "node proxy.js"
+  },
+  "keywords": [
+    "claude-code",
+    "anthropic",
+    "proxy",
+    "vision",
+    "multimodal",
+    "qwen-vl",
+    "dashscope",
+    "glm"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

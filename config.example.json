@@ -1,0 +1,12 @@
+{
+  "port": 8788,
+
+  "brainBaseUrl": "https://你的大脑模型的-anthropic-兼容端点/apps/anthropic",
+  "brainApiKey": "你的大脑模型 API Key",
+
+  "eyesUrl": "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+  "eyesApiKey": "",
+  "eyesModel": "qwen-vl-max",
+
+  "visionPrompt": "请尽可能详尽、准确地描述这张图片的全部内容：包括所有可见的文字与数字（逐字逐数照抄，不要漏）、代码、图表、表格、界面布局、颜色、物体及其位置关系。只陈述你看到的事实，不要做任何推理或解答，因为后续会有另一个模型基于你的描述来推理。用中文回答。"
+}
